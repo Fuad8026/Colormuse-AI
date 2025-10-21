@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ColorMuse AI</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="index.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/genai": "https://esm.run/@google/genai"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <main class="container">
+      <header class="app-header">
+        <h1>ColorMuse AI</h1>
+        <p>
+          Bring your photos to life.
+          <i
+            class="fa-solid fa-circle-question help-icon"
+            data-tip="For best results, use high-quality, clear images. AI works best with well-defined subjects and backgrounds."
+          ></i>
+        </p>
+      </header>
+
+      <div id="app-content" class="app-content">
+        <div id="upload-screen">
+            <div class="feature-grid">
+              <button id="colorize-button" class="feature-card">
+                <div class="card-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <h3>Colorize Photo</h3>
+                <p>Breathe life into black and white images.</p>
+              </button>
+              <button id="remove-button" class="feature-card">
+                <div class="card-icon"><i class="fa-solid fa-eraser"></i></div>
+                <h3>Remove Object</h3>
+                <p>Erase unwanted objects from any picture.</p>
+              </button>
+              <button id="remove-people-button" class="feature-card">
+                <div class="card-icon"><i class="fa-solid fa-user-slash"></i></div>
+                <h3>Remove People</h3>
+                <p>Clear out crowds and photobombers.</p>
+              </button>
+              <button id="remove-background-button" class="feature-card">
+                <div class="card-icon"><i class="fa-solid fa-wand-magic"></i></div>
+                <h3>Remove Background</h3>
+                <p>Isolate your subject with a transparent BG.</p>
+              </button>
+              <button id="change-background-button" class="feature-card">
+                <div class="card-icon"><i class="fa-solid fa-mountain-sun"></i></div>
+                <h3>Change Background</h3>
+                <p>Place your subject in a new environment.</p>
+              </button>
+              <button id="edit-clothing-button" class="feature-card">
+                <div class="card-icon"><i class="fa-solid fa-shirt"></i></div>
+                <h3>Edit Clothing</h3>
+                <p>Digitally alter or change outfits.</p>
+              </button>
+              <button id="style-transfer-button" class="feature-card">
+                <div class="card-icon"><i class="fa-solid fa-palette"></i></div>
+                <h3>Artistic Style</h3>
+                <p>Redraw your photo in a different artistic style.</p>
+              </button>
+              <button id="time-travel-button" class="feature-card">
+                <div class="card-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <h3>Time Travel Filter</h3>
+                <p>Apply iconic styles from different eras.</p>
+              </button>
+              <button id="generate-image-button" class="feature-card">
+                <div class="card-icon"><i class="fa-solid fa-image"></i></div>
+                <h3>Generate Image</h3>
+                <p>Create unique images from text descriptions.</p>
+              </button>
+            </div>
+            <input type="file" id="file-input" accept="image/*" hidden />
+          </div>
+
+        <div id="tool-page-screen" class="tool-page-screen" hidden>
+            <h2 id="tool-page-title">Tool Title</h2>
+            <p id="tool-page-description">Tool description goes here.</p>
+            <div class="button-container">
+                <button id="tool-page-upload-button" class="download-button">
+                    <i class="fa-solid fa-upload"></i> Upload Image
+                </button>
+                <button id="tool-page-back-button" class="reset-button">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </button>
+            </div>
+        </div>
+
+        <div id="loading-screen" class="loading-screen" hidden>
+          <div class="spinner"></div>
+          <p>AI is working its magic... please wait.</p>
+        </div>
+
+        <div id="generation-screen" class="clothing-screen" hidden>
+            <p>Describe the image you want to create.</p>
+            <div class="generation-controls">
+                <div class="prompt-container">
+                  <input type="text" id="generation-prompt" class="prompt-input" placeholder="e.g., 'A robot holding a red skateboard'">
+                  <i
+                    class="fa-solid fa-circle-question help-icon"
+                    data-tip="Be specific! Include subject, style, colors, and environment for best results. E.g., 'A photorealistic image of an astronaut riding a horse on Mars'."
+                  ></i>
+                </div>
+                <div class="generation-options-container">
+                    <div class="prompt-container aspect-ratio-container">
+                        <label>Aspect ratio</label>
+                        <div class="custom-select" id="aspect-ratio-select">
+                            <div class="selected-option" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                                <span id="selected-aspect-ratio-text">1:1</span>
+                                <svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                            </div>
+                            <div class="options-list" role="listbox" hidden="">
+                                <div class="option" data-value="1:1" role="option" tabindex="0">1:1</div>
+                                <div class="option" data-value="16:9" role="option" tabindex="0">16:9</div>
+                                <div class="option" data-value="9:16" role="option" tabindex="0">9:16</div>
+                                <div class="option" data-value="4:3" role="option" tabindex="0">4:3</div>
+                                <div class="option" data-value="3:4" role="option" tabindex="0">3:4</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="prompt-container aspect-ratio-container">
+                      <label>Quality</label>
+                      <div class="custom-select" id="quality-select">
+                          <div class="selected-option" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                              <span id="selected-quality-text">Standard</span>
+                              <svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          </div>
+                          <div class="options-list" role="listbox" hidden="">
+                              <div class="option" data-value="standard" role="option" tabindex="0">Standard</div>
+                              <div class="option" data-value="high" role="option" tabindex="0">High</div>
+                          </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="button-container">
+                <button id="process-generation-button" class="download-button">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Generate
+                </button>
+                <button id="cancel-generation-button" class="reset-button">
+                    <i class="fa-solid fa-times"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+
+        <div id="background-screen" class="clothing-screen" hidden>
+          <div class="image-comparison-container" id="background-container">
+               <img id="background-image" alt="Image to change background on" />
+          </div>
+          <div class="clothing-controls">
+              <input type="text" id="background-prompt" class="prompt-input" placeholder="e.g., 'a beach at sunset'">
+              <i
+                class="fa-solid fa-circle-question help-icon"
+                data-tip="Be descriptive! Examples: 'a bustling city street at night', 'a serene forest with sunlight filtering through the trees', or 'the surface of Mars'."
+              ></i>
+          </div>
+          <div class="button-container">
+              <button id="process-background-button" class="download-button">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  Generate
+              </button>
+              <button id="cancel-background-button" class="reset-button">
+                  <i class="fa-solid fa-times"></i>
+                  Cancel
+              </button>
+          </div>
+        </div>
+
+        <div id="clothing-screen" class="clothing-screen" hidden>
+          <div class="image-comparison-container" id="clothing-container">
+               <img id="clothing-image" alt="Image to edit clothing on" />
+          </div>
+          <div class="clothing-controls">
+              <input type="text" id="clothing-prompt" class="prompt-input" placeholder="e.g., 'Change shirt to a blue polo'">
+              <i
+                class="fa-solid fa-circle-question help-icon"
+                data-tip="Be descriptive! For example: 'Add a red scarf', 'Change the dress to a long, black gown', or 'Give the person a leather jacket'."
+              ></i>
+          </div>
+          <div class="button-container">
+              <button id="process-clothing-button" class="download-button">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  Generate
+              </button>
+              <button id="cancel-clothing-button" class="reset-button">
+                  <i class="fa-solid fa-times"></i>
+                  Cancel
+              </button>
+          </div>
+        </div>
+        
+        <div id="style-transfer-screen" class="clothing-screen" hidden>
+          <div class="image-comparison-container" id="style-transfer-container">
+               <img id="style-transfer-image" alt="Image to apply style to" />
+          </div>
+          <p>Choose an artistic style to apply to your image.</p>
+          <div class="style-gallery">
+              <div class="style-card" data-style="pixar">
+                  <i class="fa-solid fa-child-reaching"></i>
+                  <span>Pixar</span>
+              </div>
+              <div class="style-card" data-style="anime">
+                  <i class="fa-solid fa-dragon"></i>
+                  <span>Anime</span>
+              </div>
+              <div class="style-card" data-style="cyberpunk">
+                  <i class="fa-solid fa-robot"></i>
+                  <span>Cyberpunk</span>
+              </div>
+              <div class="style-card" data-style="painting">
+                  <i class="fa-solid fa-palette"></i>
+                  <span>Old Painting</span>
+              </div>
+              <div class="style-card" data-style="disney">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  <span>Disney 3D</span>
+              </div>
+              <div class="style-card" data-style="portrait">
+                  <i class="fa-solid fa-camera-retro"></i>
+                  <span>Realistic</span>
+              </div>
+          </div>
+          <div class="button-container">
+              <button id="process-style-transfer-button" class="download-button" disabled>
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  Generate
+              </button>
+              <button id="cancel-style-transfer-button" class="reset-button">
+                  <i class="fa-solid fa-times"></i>
+                  Cancel
+              </button>
+          </div>
+        </div>
+
+        <div id="masking-screen" class="masking-screen" hidden>
+            <div class="image-comparison-container" id="masking-container">
+                <img id="masking-image" alt="Image to edit" />
+                <canvas id="masking-canvas"></canvas>
+            </div>
+            <div class="masking-controls">
+                <label for="brush-size">Brush Size:</label>
+                <i
+                  class="fa-solid fa-circle-question help-icon"
+                  data-tip="Completely cover the object you want to remove, including its shadow. Use a larger brush for big areas and a smaller one for edges."
+                ></i>
+                <input type="range" id="brush-size" min="5" max="100" value="30">
+                <button id="undo-button" class="control-button" aria-label="Undo last stroke"><i class="fa-solid fa-undo"></i> Undo</button>
+                <button id="clear-button" class="control-button" aria-label="Clear mask"><i class="fa-solid fa-trash"></i> Clear</button>
+            </div>
+            <div class="button-container">
+                <button id="process-remove-button" class="download-button">
+                    <i class="fa-solid fa-check"></i>
+                    Remove Object
+                </button>
+                <button id="cancel-masking-button" class="reset-button">
+                    <i class="fa-solid fa-times"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+
+        <div id="time-travel-screen" hidden>
+            <div class="time-travel-gallery">
+              <div class="time-travel-card">
+                <h3>1920s Style</h3>
+                <div class="time-travel-image-container">
+                  <img id="image-1920s" alt="1920s style photo" />
+                </div>
+                <button class="control-button download-time-travel" data-target="image-1920s">
+                  <i class="fa-solid fa-download"></i> Download
+                </button>
+              </div>
+              <div class="time-travel-card">
+                <h3>1980s Style</h3>
+                <div class="time-travel-image-container">
+                  <img id="image-1980s" alt="1980s style photo" />
+                </div>
+                <button class="control-button download-time-travel" data-target="image-1980s">
+                  <i class="fa-solid fa-download"></i> Download
+                </button>
+              </div>
+              <div class="time-travel-card">
+                <h3>Modern HDR</h3>
+                <div class="time-travel-image-container">
+                  <img id="image-modern" alt="Modern HDR style photo" />
+                </div>
+                <button class="control-button download-time-travel" data-target="image-modern">
+                  <i class="fa-solid fa-download"></i> Download
+                </button>
+              </div>
+            </div>
+            <div class="button-container">
+              <button id="reset-time-travel-button" class="reset-button">
+                <i class="fa-solid fa-arrow-rotate-left"></i>
+                Start Over
+              </button>
+            </div>
+          </div>
+
+        <div id="result-screen" class="result-screen" hidden>
+          <div class="image-comparison-container">
+            <div class="image-container">
+              <img id="original-image" alt="Original image" />
+            </div>
+            <div class="image-container comparison-image">
+              <img id="result-image" alt="AI edited image" />
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value="50"
+              class="slider"
+              id="slider"
+              aria-label="Image comparison slider"
+            />
+          </div>
+          <div class="button-container">
+            <button id="download-button" class="download-button">
+              <i class="fa-solid fa-download"></i>
+              Download Full Quality
+            </button>
+            <button id="reset-button" class="reset-button">
+              <i class="fa-solid fa-arrow-rotate-left"></i>
+              Start Over
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <div id="tooltip" class="tooltip" hidden></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

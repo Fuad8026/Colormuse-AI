@@ -1,0 +1,6 @@
+{
+  "name": "ColorMuse AI - Photo Colorization",
+  "description": "An AI-powered app to restore and colorize old black-and-white photos using the Gemini API.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
